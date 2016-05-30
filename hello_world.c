@@ -1,10 +1,16 @@
-/* Lab 1, Phase 1
+/*
+*
+* MTE 325, Lab 1
+* --------------
+* Oswin Rodrigues, 20520352
+* Mahmubul (Momo) Hoque, < INSERT STUDENT NUMBER HERE >
+*
 */
 
 // #include <io.h>
-#include "alt_types.h"
 #include <stdio.h>
 #include <unistd.h>
+#include "alt_types.h"
 #include "system.h"
 #include "sys/alt_irq.h"
 #include "altera_avalon_pio_regs.h"
@@ -111,65 +117,65 @@ void init_button(){
 volatile alt_u8 count3 = 0x00;
 
 void PULSE_ISR(){
-	if (IORD(PIO_PULSE_BASE, 0)){
-		IOWR(PIO_RESPONSE_BASE, 0, 1);
-	}
-	else {
-		IOWR(PIO_RESPONSE_BASE, 0, 0);
-	}
+    if (IORD(PIO_PULSE_BASE, 0)){
+        IOWR(PIO_RESPONSE_BASE, 0, 1);
+    }
+    else {
+        IOWR(PIO_RESPONSE_BASE, 0, 0);
+    }
 }
 
 void init_pulse(){
-	// Init
-	alt_irq_register( PIO_PULSE_IRQ, (void *)0, PULSE_ISR );
-	// Reset
-	IOWR(PIO_PULSE_BASE, 0, 0);
-	// Enable
-	IOWR(PIO_PULSE_BASE, 2, 0x1);
+    // Init
+    alt_irq_register( PIO_PULSE_IRQ, (void *)0, PULSE_ISR );
+    // Reset
+    IOWR(PIO_PULSE_BASE, 0, 0);
+    // Enable
+    IOWR(PIO_PULSE_BASE, 2, 0x1);
 }
 
 int main(){
-	if((IORD(SWITCH_PIO_BASE,0) >> 15)) {
-		//Phase I
-		init_button();
-		// printf("inited_button\n");
-		while (1) {
-			while ( !pb1_pressed && !pb2_pressed ) {};
-			// printf("exited wait loop\n");
-			if ( pb1_pressed ){
-				// printf("pb1_pressed\n");
-				// printf("%d\n", buttons);
-				pb1_pressed = 0;
-				count1 = 0;
-				switch_state1 = IORD(SWITCH_PIO_BASE, 0) & 0xff;
-				init_timer_0();
-			}
-			else if ( pb2_pressed ){
-				// printf("pb2_pressed\n");
-				// printf("%d\n", buttons);
-				pb2_pressed = 0;
-				count2 = 0;
-				switch_state2 = IORD(SWITCH_PIO_BASE, 0) & 0xff;
-				init_timer_1();
-			}
-		}
-	}
-	else {
-		//Phase II;
+    if((IORD(SWITCH_PIO_BASE,0) >> 15)) {
+        //Phase I
+        init_button();
+        // printf("inited_button\n");
+        while (1) {
+            while ( !pb1_pressed && !pb2_pressed ) {};
+            // printf("exited wait loop\n");
+            if ( pb1_pressed ){
+                // printf("pb1_pressed\n");
+                // printf("%d\n", buttons);
+                pb1_pressed = 0;
+                count1 = 0;
+                switch_state1 = IORD(SWITCH_PIO_BASE, 0) & 0xff;
+                init_timer_0();
+            }
+            else if ( pb2_pressed ){
+                // printf("pb2_pressed\n");
+                // printf("%d\n", buttons);
+                pb2_pressed = 0;
+                count2 = 0;
+                switch_state2 = IORD(SWITCH_PIO_BASE, 0) & 0xff;
+                init_timer_1();
+            }
+        }
+    }
+    else {
+        //Phase II;
 
-		// Init pulse interrupt
-		init_pulse();
+        // Init pulse interrupt
+        init_pulse();
 
-		// Init egm
-		init(7,7);
+        // Init egm
+        init(7,7);
 
-		background(500);
+        background(500);
 
-		finalize();
+        finalize();
 
-		// usleep(10000);
+        // usleep(10000);
 
-	}
+    }
 
     return 0;
 }
